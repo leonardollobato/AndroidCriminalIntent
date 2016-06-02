@@ -1,5 +1,7 @@
 package com.example.leonardollobato.criminalintent;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,6 +28,8 @@ public class CrimeListFragment extends Fragment {
 
     private RecyclerView mCrimeRecyclerView;
     private CrimeAdapter mAdapter;
+    private static int clickedViewIndex = -1;
+
 
     @Nullable
     @Override
@@ -41,12 +45,32 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateUI(){
-        Log.d(TAG, " CrimeListFragment *updateUI*");
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         List<Crime> crimes = crimeLab.getCrimes();
 
-        mAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mAdapter);
+        if(mAdapter == null){
+            mAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mAdapter);
+        }else{
+            //mAdapter.notifyDataSetChanged();
+            mAdapter.notifyItemChanged(clickedViewIndex);
+        }
+
+
+    }
+
+    public static int getClickedViewIndex(){
+        return clickedViewIndex;
+    }
+
+    public static void setClickedViewIndex(int index){
+        clickedViewIndex = index;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
     }
 
     private class CrimeHolder extends  RecyclerView.ViewHolder implements View.OnClickListener{
@@ -64,8 +88,6 @@ public class CrimeListFragment extends Fragment {
             mTitleTextView = (TextView) itemView.findViewById(R.id.list_item_crime_title_text_view);
             mDateTextView = (TextView) itemView.findViewById(R.id.list_item_crime_date_text_view);
             mSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.list_item_crime_solved_check_box);
-
-            Log.d(TAG, " CrimerHolder *Constructor*");
         }
 
         public void bindCrime(Crime crime){
@@ -79,23 +101,10 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            StringBuilder message = new StringBuilder(mCrime.getTitle() + " was clicked -> ");
+            setClickedViewIndex(mCrimeRecyclerView.indexOfChild(v));
 
-            switch (v.getId()){
-                case R.id.list_item_crime_title_text_view:
-                    message.append(" TITLE");
-                    break;
-                case R.id.list_item_crime_solved_check_box:
-                    message.append(" CHECKBOX");
-                    break;
-                case R.id.list_item_crime_date_text_view:
-                    message.append(" DATE");
-                    break;
-                default:
-                    message.append(" NONE");
-                    break;
-            }
-            Toast.makeText(getActivity(), message,Toast.LENGTH_SHORT).show();
+            Intent intent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId());
+            startActivity(intent);
         }
     }
 
@@ -104,12 +113,10 @@ public class CrimeListFragment extends Fragment {
 
         public CrimeAdapter(List<Crime> crimes){
             mCrimes = crimes;
-            Log.d(TAG, " CrimeAdapter *Constructor*");
         }
 
         @Override
         public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.d(TAG, " CrimeAdapter *onCreateViewHolder*");
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
             View view = layoutInflater
                     .inflate(R.layout.list_item_crime, parent, false);
@@ -119,15 +126,12 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(CrimeHolder holder, int position) {
-            Log.d(TAG, " CrimeAdapter *onBindViewHolder* " + position);
             Crime crime = mCrimes.get(position);
-
             holder.bindCrime(crime);
         }
 
         @Override
         public int getItemCount() {
-            Log.d(TAG, " CrimeAdapter *getItemCount*");
             return mCrimes.size();
         }
     }
