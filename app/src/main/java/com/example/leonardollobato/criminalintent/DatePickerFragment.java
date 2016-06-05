@@ -33,6 +33,7 @@ public class DatePickerFragment extends DialogFragment {
         getTargetFragment()
                 .onActivityResult(getTargetRequestCode(), resultCode, i);
     }
+
     public static DatePickerFragment newInstance(Date date){
         Bundle args = new Bundle();
         args.putSerializable(ARG_DATE, date);

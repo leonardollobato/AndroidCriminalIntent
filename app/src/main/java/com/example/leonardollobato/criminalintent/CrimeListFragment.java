@@ -30,6 +30,13 @@ public class CrimeListFragment extends Fragment {
     private CrimeAdapter mAdapter;
     private static int clickedViewIndex = -1;
 
+    public static int getClickedViewIndex(){
+        return clickedViewIndex;
+    }
+
+    public static void setClickedViewIndex(int index){
+        clickedViewIndex = index;
+    }
 
     @Nullable
     @Override
@@ -53,24 +60,42 @@ public class CrimeListFragment extends Fragment {
             mCrimeRecyclerView.setAdapter(mAdapter);
         }else{
             //mAdapter.notifyDataSetChanged();
-            mAdapter.notifyItemChanged(clickedViewIndex);
+            mAdapter.notifyItemChanged(this.getClickedViewIndex());
         }
-
-
-    }
-
-    public static int getClickedViewIndex(){
-        return clickedViewIndex;
-    }
-
-    public static void setClickedViewIndex(int index){
-        clickedViewIndex = index;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         updateUI();
+    }
+
+    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
+        private List<Crime> mCrimes;
+
+        public CrimeAdapter(List<Crime> crimes){
+            mCrimes = crimes;
+        }
+
+        @Override
+        public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            View view = layoutInflater
+                    .inflate(R.layout.list_item_crime, parent, false);
+            return new CrimeHolder(view);
+
+        }
+
+        @Override
+        public void onBindViewHolder(CrimeHolder holder, int position) {
+            Crime crime = mCrimes.get(position);
+            holder.bindCrime(crime);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mCrimes.size();
+        }
     }
 
     private class CrimeHolder extends  RecyclerView.ViewHolder implements View.OnClickListener{
@@ -101,38 +126,13 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            setClickedViewIndex(mCrimeRecyclerView.indexOfChild(v));
+            CrimeListFragment
+                    .setClickedViewIndex(mCrimeRecyclerView.indexOfChild(v));
 
             Intent intent = CrimePagerActivity.newIntent(getActivity(),mCrime.getId());
             startActivity(intent);
         }
     }
 
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
-        private List<Crime> mCrimes;
 
-        public CrimeAdapter(List<Crime> crimes){
-            mCrimes = crimes;
-        }
-
-        @Override
-        public CrimeHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            View view = layoutInflater
-                    .inflate(R.layout.list_item_crime, parent, false);
-            return new CrimeHolder(view);
-
-        }
-
-        @Override
-        public void onBindViewHolder(CrimeHolder holder, int position) {
-            Crime crime = mCrimes.get(position);
-            holder.bindCrime(crime);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mCrimes.size();
-        }
-    }
 }
