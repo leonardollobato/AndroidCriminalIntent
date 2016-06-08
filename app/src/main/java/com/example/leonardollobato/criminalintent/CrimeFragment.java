@@ -138,7 +138,6 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updateDate() {
-
         DateFormat df = new DateFormat();
         String formattedTime = df.format("EEEE, MMM dd, yyyy", mCrime.getDate()).toString();
 
