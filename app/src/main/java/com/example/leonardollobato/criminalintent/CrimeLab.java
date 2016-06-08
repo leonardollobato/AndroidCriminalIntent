@@ -39,6 +39,11 @@ public class CrimeLab {
         mCrimes.add(c);
     }
 
+    public void removeCrime(Crime crime){
+       int index =  mCrimes.indexOf(crime);
+        mCrimes.remove(index);
+    }
+
 
     public Crime getCrime(UUID id){
         for(Crime crime: mCrimes){

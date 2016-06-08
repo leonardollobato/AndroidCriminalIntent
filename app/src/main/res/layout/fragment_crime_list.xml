@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 <android.support.v7.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
@@ -6,4 +13,34 @@
     android:layout_height="match_parent"
     android:id="@+id/crime_recycler_view">
 
+
+
 </android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:id="@+id/recycler_view_placeholder"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/recycler_view_placeholder"
+        android:textSize="18sp"
+        android:textStyle="bold|italic"
+        android:layout_marginBottom="20dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_new_crime_button"
+        android:text="@string/button_recycler_view_placeholder"
+        android:padding="10dp"
+        android:layout_gravity="center"/>
+    </LinearLayout>
+
+
+</LinearLayout>
