@@ -2,9 +2,11 @@ package com.example.leonardollobato.criminalintent;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.leonardollobato.criminalintent.database.CrimeBaseHelper;
+import com.example.leonardollobato.criminalintent.database.CrimeCursorWrapper;
 import com.example.leonardollobato.criminalintent.database.CrimeDbSchema;
 import com.example.leonardollobato.criminalintent.database.CrimeDbSchema.CrimeTable;
 
@@ -36,21 +38,63 @@ public class CrimeLab {
     }
 
     public List<Crime> getCrimes(){
-        return new ArrayList<>();
+        List<Crime> crimes = new ArrayList<>();
+
+        CrimeCursorWrapper cursor = queryCrimes(null,null);
+
+        try{
+            cursor.moveToFirst();
+
+            while(!cursor.isAfterLast()){
+                crimes.add(cursor.getCrime());
+                cursor.moveToNext();
+            }
+        }finally{
+            cursor.close();
+        }
+
+        return crimes;
     }
 
     public void addCrime(Crime c){
-
+        ContentValues values = getContentValues(c);
+        mDatabase.insert(CrimeTable.NAME, null, values);
     }
 
     public void removeCrime(Crime crime){
-//       int index =  mCrimes.indexOf(crime);
-//        mCrimes.remove(index);
+        StringBuilder whereClauses = new StringBuilder(CrimeTable.Cols.UUID);
+        whereClauses.append(" = ? ");
+
+        mDatabase.delete(CrimeTable.NAME,
+                whereClauses.toString(),
+                new String[] { crime.getId().toString()});
     }
 
+    public void updateCrime(Crime crime){
+        ContentValues values = getContentValues(crime);
+        StringBuilder whereClauses = new StringBuilder(CrimeTable.Cols.UUID);
+        whereClauses.append(" = ? ");
+
+        mDatabase.update(CrimeTable.NAME,
+                        values,
+                        whereClauses.toString(),
+                        new String[] { crime.getId().toString()});
+    }
 
     public Crime getCrime(UUID id){
-        return null;
+        CrimeCursorWrapper cursor = queryCrimes(CrimeTable.Cols.UUID + " = ?", new String[]{id.toString()});
+
+        try {
+            if(cursor.getCount() ==0){
+                return null;
+            }
+
+            cursor.moveToFirst();
+            return cursor.getCrime();
+
+        }finally {
+            cursor.close();
+        }
     }
 
     private static ContentValues getContentValues(Crime crime){
@@ -63,5 +107,19 @@ public class CrimeLab {
         values.put(CrimeTable.Cols.SOLVED, crime.isSolved() ? 1 : 0);
 
         return values;
+    }
+
+    private CrimeCursorWrapper queryCrimes(String whereClause, String[] whereArgs){
+        Cursor cursor = mDatabase.query(
+                CrimeTable.NAME,
+                null,
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                null
+        );
+
+        return new CrimeCursorWrapper(cursor);
     }
 }

@@ -99,6 +99,7 @@ public class CrimeListFragment extends Fragment {
             mCrimeRecyclerView.setAdapter(mAdapter);
         }else{
             //mAdapter.notifyDataSetChanged();
+            mAdapter.setCrimes(crimes);
             mAdapter.notifyItemRangeRemoved(this.getClickedViewIndex(), crimes.size());
             mAdapter.notifyItemChanged(this.getClickedViewIndex());
         }
@@ -180,6 +181,8 @@ public class CrimeListFragment extends Fragment {
 
     }
 
+
+
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder>{
         private List<Crime> mCrimes;
 
@@ -205,6 +208,10 @@ public class CrimeListFragment extends Fragment {
         @Override
         public int getItemCount() {
             return mCrimes.size();
+        }
+
+        public void setCrimes(List<Crime> crimes){
+            mCrimes = crimes;
         }
     }
 

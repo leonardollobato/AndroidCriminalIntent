@@ -50,7 +50,11 @@ public class Crime {
     }
 
     public Crime() {
-        this.mId = UUID.randomUUID();
+        this(UUID.randomUUID());
+    }
+
+    public Crime(UUID id){
+        this.mId = id;
         this.mDate = new Date();
         this.mTime = new Date();
     }
