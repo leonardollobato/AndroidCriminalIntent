@@ -23,6 +23,10 @@ import android.widget.EditText;
 import java.util.Date;
 import java.util.UUID;
 
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmModel;
+
 public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
@@ -37,9 +41,9 @@ public class CrimeFragment extends Fragment {
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
 
-    public static CrimeFragment newInstance(UUID crimeId){
+    public static CrimeFragment newInstance(long crimeId){
         Bundle args = new Bundle();
-        args.putSerializable(ARG_CRIME_ID, crimeId);
+        args.putLong(ARG_CRIME_ID, crimeId);
 
         CrimeFragment fragment = new CrimeFragment();
         fragment.setArguments(args);
@@ -51,7 +55,7 @@ public class CrimeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
+        long crimeId = getArguments().getLong(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
 
         setHasOptionsMenu(true);
@@ -98,8 +102,15 @@ public class CrimeFragment extends Fragment {
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mCrime.setTitle(s.toString());
+            public void onTextChanged(final CharSequence s, int start, int before, int count) {
+//                Crime crm = new Crime();
+//                crm.setTitle(s.toString());
+//
+//                Realm realm = Realm.getDefaultInstance();
+//                realm.beginTransaction();
+//                Crime realmCrime = realm.copyToRealm(crm);
+//                realm.commitTransaction();
+//                //mCrime.setTitle(s.toString());
             }
 
             @Override
@@ -108,10 +119,9 @@ public class CrimeFragment extends Fragment {
             }
         });
 
-        mDateButton = (Button) v.findViewById(R.id.crime_date);
 
-//        DateFormat df = new DateFormat();
-//        String formattedDate = df.format("EEEE, MMM dd, yyyy", mCrime.getDate()).toString();
+
+        mDateButton = (Button) v.findViewById(R.id.crime_date);
 
         updateDate();
         mDateButton.setOnClickListener(new View.OnClickListener(){
@@ -125,7 +135,6 @@ public class CrimeFragment extends Fragment {
         });
 
         mTimeButton = (Button) v.findViewById(R.id.crime_time);
-        //String formattedTime = df.format("HH:mm", mCrime.getTime()).toString();
 
         updateTime();
         mTimeButton.setOnClickListener(new View.OnClickListener(){

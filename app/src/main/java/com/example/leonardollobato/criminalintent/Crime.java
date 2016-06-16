@@ -3,11 +3,13 @@ package com.example.leonardollobato.criminalintent;
 import java.util.Date;
 import java.util.UUID;
 
+import io.realm.RealmObject;
+
 /**
  * Created by leonardollobato on 5/29/16.
  */
-public class Crime {
-    private UUID mId;
+public class Crime extends RealmObject {
+    private long mId;
     private String mTitle;
     private Date mDate;
     private Date mTime;
@@ -21,9 +23,11 @@ public class Crime {
         mTime = time;
     }
 
-    public UUID getId() {
+    public long getId() {
         return mId;
     }
+
+    public void setId(long id) { this.mId = id;}
 
     public Date getDate() {
         return mDate;
@@ -49,12 +53,7 @@ public class Crime {
         mTitle = title;
     }
 
-    public Crime() {
-        this(UUID.randomUUID());
-    }
-
-    public Crime(UUID id){
-        this.mId = id;
+    public Crime(){
         this.mDate = new Date();
         this.mTime = new Date();
     }

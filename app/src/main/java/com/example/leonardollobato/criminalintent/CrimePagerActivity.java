@@ -26,7 +26,7 @@ public class CrimePagerActivity extends AppCompatActivity {
             = "com.leonardolobato.criminalintent.extra_crime_id";
 
 
-    public static Intent newIntent(Context packageContent, UUID crimeId) {
+    public static Intent newIntent(Context packageContent, long crimeId) {
         Intent i = new Intent(packageContent, CrimePagerActivity.class);
         i.putExtra(EXTRA_CRIME_ID, crimeId);
         return i;
@@ -37,7 +37,7 @@ public class CrimePagerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crime_pager);
 
-        UUID crimeId = (UUID) getIntent().getSerializableExtra(EXTRA_CRIME_ID);
+        long crimeId = getIntent().getLongExtra(EXTRA_CRIME_ID,0);
 
         mViewPager = (ViewPager) findViewById(R.id.activity_crime_pager_view_pager);
 
@@ -60,7 +60,7 @@ public class CrimePagerActivity extends AppCompatActivity {
         });
 
         for (int i = 0; i < mCrimes.size(); i++) {
-            if(mCrimes.get(i).getId().equals(crimeId)){
+            if(mCrimes.get(i).getId() == crimeId){
                 mViewPager.setCurrentItem(i);
                 break;
             }
