@@ -38,6 +38,7 @@ public class CrimeBaseHelper extends SQLiteOpenHelper{
                 .append(CrimeTable.Cols.TITLE + ", ")
                 .append(CrimeTable.Cols.DATE + ", ")
                 .append(CrimeTable.Cols.TIME + ", ")
+                .append(CrimeTable.Cols.SUSPECT + ", ")
                 .append(CrimeTable.Cols.SOLVED + " ) ");
 
         db.execSQL(sqlStatment.toString());

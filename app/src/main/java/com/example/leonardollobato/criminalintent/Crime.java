@@ -12,6 +12,7 @@ public class Crime {
     private Date mDate;
     private Date mTime;
     private boolean mSolved;
+    private String mSuspect;
 
     public Date getTime() {
         return mTime;
@@ -57,5 +58,13 @@ public class Crime {
         this.mId = id;
         this.mDate = new Date();
         this.mTime = new Date();
+    }
+
+    public String getSuspect() {
+        return mSuspect;
+    }
+
+    public void setSuspect(String suspect) {
+        mSuspect = suspect;
     }
 }
