@@ -2,9 +2,7 @@ package com.example.leonardollobato.criminalintent;
 
 
 import android.content.Context;
-
 import java.util.List;
-
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 

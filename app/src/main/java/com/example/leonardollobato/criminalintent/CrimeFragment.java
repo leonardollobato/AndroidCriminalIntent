@@ -1,6 +1,7 @@
 package com.example.leonardollobato.criminalintent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,6 +26,7 @@ import java.util.UUID;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmConfiguration;
 import io.realm.RealmModel;
 
 public class CrimeFragment extends Fragment {
@@ -34,12 +36,18 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_TIME  = 1;
 
     private Crime mCrime;
+    private Crime mCrimeNew;
     private EditText mTitleField;
     private Button mDateButton;
     private Button mTimeButton;
     private CheckBox mSolvedCheckBox;
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
+
+    private Context mApplicationContext;
+
+    private Realm mRealm;
+    private RealmConfiguration mRealmConfig;
 
     public static CrimeFragment newInstance(long crimeId){
         Bundle args = new Bundle();
@@ -55,8 +63,15 @@ public class CrimeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mApplicationContext = getActivity().getApplicationContext();
+        mRealmConfig = new RealmConfiguration.Builder(mApplicationContext).build();
+        mRealm = Realm.getInstance(mRealmConfig);
+
         long crimeId = getArguments().getLong(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+
+        mCrimeNew = new Crime();
+        mCrimeNew.setId(mCrime.getId());
 
         setHasOptionsMenu(true);
     }
@@ -65,8 +80,20 @@ public class CrimeFragment extends Fragment {
     public void onPause() {
         super.onPause();
 
-        CrimeLab.get(getActivity())
-                .updateCrime(mCrime);
+        CrimeLab.get(getActivity()).updateCrime(mCrimeNew);
+
+//        if(mCrime != null){
+//            mRealm.executeTransaction(new Realm.Transaction() {
+//                @Override
+//                public void execute(Realm realm) {
+//                    mCrime.setTitle(mTitleField.getText().toString());
+//                    mCrime.setSolved(mSolvedCheckBox.isChecked());
+//                    mCrime.setDate((Date)mDateButton.getText());
+//                    mCrime.setTime((Date)mTimeButton.getText());
+//                }
+//            });
+//        }
+
     }
 
     @Override
@@ -80,7 +107,17 @@ public class CrimeFragment extends Fragment {
 
         switch (item.getItemId()){
             case R.id.menu_item_remove_crime:
-                CrimeLab.get(getActivity()).removeCrime(mCrime);
+                mRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        final Crime result = realm
+                                .where(Crime.class)
+                                .equalTo("mId", mCrime.getId())
+                                .findFirst();
+
+                        result.deleteFromRealm();
+                    }
+                });
                 getActivity().finish();
                 return true;
             default:
@@ -99,18 +136,15 @@ public class CrimeFragment extends Fragment {
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
             }
 
             @Override
-            public void onTextChanged(final CharSequence s, int start, int before, int count) {
-//                Crime crm = new Crime();
-//                crm.setTitle(s.toString());
-//
-//                Realm realm = Realm.getDefaultInstance();
-//                realm.beginTransaction();
-//                Crime realmCrime = realm.copyToRealm(crm);
-//                realm.commitTransaction();
-//                //mCrime.setTitle(s.toString());
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                mRealm.beginTransaction();
+//                mCrime.setTitle(s.toString());
+//                mRealm.commitTransaction();
+                mCrimeNew.setTitle(s.toString());
             }
 
             @Override
@@ -118,8 +152,6 @@ public class CrimeFragment extends Fragment {
 
             }
         });
-
-
 
         mDateButton = (Button) v.findViewById(R.id.crime_date);
 
@@ -150,12 +182,7 @@ public class CrimeFragment extends Fragment {
 
         mSolvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
         mSolvedCheckBox.setChecked(mCrime.isSolved());
-        mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mCrime.setSolved(isChecked);
-            }
-        });
+
 
         return v;
     }
@@ -167,13 +194,13 @@ public class CrimeFragment extends Fragment {
 
         if(requestCode == REQUEST_DATE){
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
-            mCrime.setDate(date);
+            //mCrime.setDate(date);
             updateDate();
         }
 
         if(requestCode == REQUEST_TIME){
             Date time = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
-            mCrime.setTime(time);
+            //mCrime.setTime(time);
             updateTime();
         }
 
